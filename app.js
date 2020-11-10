@@ -6,123 +6,162 @@ const path = require("path");
 const fs = require("fs");
 
 const OUTPUT_DIR = path.resolve(__dirname, "output");
-const outputPath = path.join(OUTPUT_DIR, "team.html");
+const outputPath = path.join(OUTPUT_DIR, "output.html");
 
 const render = require("./lib/htmlRenderer");
 
-// Write code to use inquirer to gather information about the development team members,
-// and to create objects for each team member (using the correct classes as blueprints!)
 const teamMembers = []
 const arrayId = []
 
-function appMenu() {
-    function  createTeam(){
-        // inquirer to ask which type of employee you want to create and runs the relevant function
+const createEmployee = () => {
+    function newManager() {
         inquirer.prompt([
             {
-                type: "list",
-                name: "memberChoice",
-                message: "Which type of memeber would you like to add?",
-                choices: [
-                    "Engineer",
-                    "Intern",
-                    "I don't",
-                ]
+                type: "input",
+                name: "managerName",
+                message: "What is your name?",
+            },
+            {
+                type: "input",
+                name: "managerEmail",
+                message: "Email address?"
+            },
+            {
+                type: "input",
+                name: "officeNumber",
+                message: "Office Number?",
+            },
+            {
+                type: "input",
+                name: "managerGithub",
+                message: "Github name?",
+            },
 
-            }
         ])
-        .then(chosen =>)
-    }
-    function createManager() {
-
-    }
-
-    function createEngineer() {
-        inquirer.prompt([
-            {
-                type: "input",
-                name: "engineerName",
-                message: "What is your engineer's name",
-                validate: answer => {
-                    if(answer !== "") {
-                        return true
-                    }
-
-                    return "Please enter a valid name"
-                }
-            },
-            {
-                type: "input",
-                name: "engineerId",
-                message: "What is your employee's ID?",
-                validate: answer => {
-                    if(answer !== "") {
-                        return true
-                    }
-
-                    return "Please enter a valid ID"
-                }
-            },
-            {
-                type: "input",
-                name: "engineerEmail",
-                message: "What is your employee's email?",
-                validate: answer => {
-                    if(answer !== "") {
-                        return true
-                    }
-
-                    return "Please enter a valid email"
-                }
-            },
-            {
-                type: "input",
-                name: "engineerGithub",
-                message: "What is your employee's Github?",
-                validate: answer => {
-                    if(answer !== "") {
-                        return true
-                    }
-
-                    return "Please enter a valid github"
-                }
-            }
-        ]).then(answers => {
-            const engineer = new Engineer(answers.engineerName, answers.engineerId, answers.engineerEmail, answers.engineerGithub)
-            teamMembers.push(engineer)
-            arrayId.push(answers.engineerId)
-            // run a function here that creates the entire "team" prompting you to create another employee
+        .then(answers => {
+            const manager = new Manager(answers.managerName, answers.managerEmail, answers.officeManager, answers.managerGithub)
+            teamMembers.push(manager)
+            arrayId.push(answers.managerID)
+            createTeam();
         })
-    }
-
-    function buildTeam() {
-        // Create the output directory if the output path doesn't exist
-        if (!fs.existsSync(OUTPUT_DIR)) {
-          fs.mkdirSync(OUTPUT_DIR)
+        function createTeam(){
+            inquirer.prompt([
+                {
+                    type: "list",
+                    name: "memberChoice",
+                    message: "Whats your new team members role?",
+                    choices: [
+                        "Engineer",
+                        "Intern",
+                        "No new entries to add"
+                    ]
+                }
+        ]).then(chosen => {
+            switch (chosen.memberChoice) {
+                case "Engineer":
+                    createEngineer();
+                    break;
+                case "Intern":
+                    createIntern();
+                    break;
+                default:
+                    createTeam();
+            }
         }
+        )
+        function createEngineer() {
+            inquirer.prompt([
+                {
+                    type: "input",
+                    name: "engineerName",
+                    message: "What is your engineer's name",
+                    validate: answer => {
+                        if(answer !== "") {
+                            return true
+                        }
+    
+                        return "Please enter a valid name"
+                    }
+                },
+                {
+                    type: "input",
+                    name: "engineerId",
+                    message: "What is your engineers's ID?",
+                    validate: answer => {
+                        if(answer !== "") {
+                            return true
+                        }
+    
+                        return "Please enter a valid ID"
+                    }
+                },
+                {
+                    type: "input",
+                    name: "engineerEmail",
+                    message: "What is your engineer's email?",
+                    validate: answer => {
+                        if(answer !== "") {
+                            return true
+                        }
+    
+                        return "Please enter a valid email"
+                    }
+                },
+                {
+                    type: "input",
+                    name: "engineerGithub",
+                    message: "What is your engineer's Github?",
+                    validate: answer => {
+                        if(answer !== "") {
+                            return true
+                        }
+    
+                        return "Please enter a valid github"
+                    }
+                }
+            ]).then(answers => {
+                const engineer = new Engineer(answers.engineerName, answers.engineerId, answers.engineerEmail, answers.engineerGithub)
+                teamMembers.push(engineer)
+                arrayId.push(answers.engineerId)
+                createTeam();
+            })
+        }
+        function createIntern() {
+            inquirer.prompt([
+                {
+                    type: "input",
+                    name: "internName",
+                    message: "What is the Intern's name?",
+                },
+                {
+                    type: "input",
+                    name: "internEmail",
+                    message: "What is the intern's email address?"
+                },
+                {
+                    type: "input",
+                    name: "internID",
+                    message: "What is the school ID?",
+                },
+                {
+                    type: "input",
+                    name: "internSchool",
+                    message: "What is the college name?",
+                }
+            ]).then((answers) => {
+                const intern = new Intern(answers.internName, answers.internID, answers.internEmail, answers.internSchool)
+                teamMembers.push(intern)
+                arrayID.push(answers.internID)
+                createTeam();
+            })
+        }
+    } 
+    function buildTeam() {
         fs.writeFileSync(outputPath, render(teamMembers), "utf-8");
       }
+    }
+newManager();
 
-      
 }
 
-appMenu()
-// After the user has input all employees desired, call the `render` function (required
-// above) and pass in an array containing all employee objects; the `render` function will
-// generate and return a block of HTML including templated divs for each employee!
-
-// After you have your html, you're now ready to create an HTML file using the HTML
-// returned from the `render` function. Now write it to a file named `team.html` in the
-// `output` folder. You can use the variable `outputPath` above target this location.
-// Hint: you may need to check if the `output` folder exists and create it if it
-// does not.
-
-// HINT: each employee type (manager, engineer, or intern) has slightly different
-// information; write your code to ask different questions via inquirer depending on
-// employee type.
-
-// HINT: make sure to build out your classes first! Remember that your Manager, Engineer,
-// and Intern classes should all extend from a class named Employee; see the directions
-// for further information. Be sure to test out each class and verify it generates an
-// object with the correct structure and methods. This structure will be crucial in order
-// for the provided `render` function to work! ```
+createEmployee();
